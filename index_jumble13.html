@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Birthday Surprise</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 60px;
+      text-align: center;
+      z-index: 1;
+      white-space: pre-line;
+      display: none;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 40px;
+      font-size: 24px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background: #00aaff;
+      color: white;
+      font-weight: bold;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="message"></div>
+  <button id="startBtn">Start Surprise 🎁</button>
+
+  <audio id="bgMusic">
+    <source src="https://raw.githubusercontent.com/raniaalaa075-oss/birthday-song/main/song.mp3.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    const messageDiv = document.getElementById('message');
+    const startBtn = document.getElementById('startBtn');
+    const bgMusic = document.getElementById('bgMusic');
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = 'HAPPYBIRTHDAY'.split('');
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).map(() => 1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00aaff';
+      ctx.font = fontSize + 'px monospace';
+
+      drops.forEach((drop, i) => {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drop * fontSize);
+
+        if (drop * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      });
+    }
+
+    // الرسائل
+    const messages = [
+      "3", "2", "1",
+      "9.9.2000",
+      "♥",
+      "Happy Birthday",
+      "To",
+      "Omar",
+      "You’re special to me",
+      "I love you 🖤"
+    ];
+    let index = 0;
+    let repeatCount = 0;
+    const maxRepeats = 4;
+    let messageInterval;
+
+    function showMessage() {
+      // اخفاء الرسالة القديمة
+      messageDiv.style.opacity = 0;
+
+      setTimeout(() => {
+        // عرض الرسالة الجديدة
+        messageDiv.textContent = messages[index];
+        messageDiv.style.opacity = 1;
+
+        index++;
+        if (index >= messages.length) {
+          index = 0;
+          repeatCount++;
+          if (repeatCount >= maxRepeats) {
+            clearInterval(messageInterval);
+            messageDiv.textContent = messages[messages.length - 1];
+            messageDiv.style.opacity = 1;
+          }
+        }
+      }, 500); // وقت الاختفاء قبل عرض الرسالة الجديدة
+    }
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      messageDiv.style.display = 'block';
+      bgMusic.play();
+
+      setInterval(drawMatrix, 35);
+      showMessage();
+      messageInterval = setInterval(showMessage, 2000);
+    });
+  </script>
+</body>
+</html>
